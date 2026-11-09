@@ -1,0 +1,59 @@
+name: Update GitHub Profile Stats
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and validate SVG cards
+        run: |
+          mkdir -p assets tmp_assets
+
+          fetch_svg() {
+            local name="$1"
+            local url="$2"
+            local tmp="tmp_assets/${name}.svg"
+            local dest="assets/${name}.svg"
+
+            echo "Fetching ${name}..."
+            if curl -fsSL --retry 3 --max-time 30 "$url" -o "$tmp"; then
+              if grep -q "<svg" "$tmp" && ! grep -qiE "Something went wrong|DEPLOYMENT_|Maximum retries|Payment required" "$tmp"; then
+                sed -i '/^[[:space:]]*undefined[[:space:]]*$/d' "$tmp"
+                mv "$tmp" "$dest"
+                echo "Updated ${dest} successfully."
+              else
+                echo "Warning: ${name} returned an error SVG, keeping existing ${dest}."
+              fi
+            else
+              echo "Warning: Failed to download ${name}, keeping existing ${dest}."
+            fi
+          }
+
+          fetch_svg "stats" "https://github-readme-stats-eight-theta.vercel.app/api?username=tmala&show_icons=true&theme=dark&hide_border=true"
+          fetch_svg "top-langs" "https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=tmala&layout=compact&theme=dark&hide_border=true"
+          fetch_svg "streak" "https://streak-stats.demolab.com?user=tmala&theme=dark&hide_border=true"
+          fetch_svg "profile-details" "https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=tmala&theme=github_dark"
+
+          rm -rf tmp_assets
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/*.svg
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update profile stats SVGs"
+            git push
+          else
+            echo "No changes to commit."
+          fi
