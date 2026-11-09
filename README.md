@@ -1,14 +1,14 @@
 ## Hi there 👋
 
 <div align="center">
-  <img src="./assets/stats.svg" height="165" alt="GitHub Stats" />
-  <img src="./assets/top-langs.svg" height="165" alt="Top Languages" />
+  <picture><img src="./assets/stats.svg" height="165" alt="GitHub Stats" /></picture>
+  <picture><img src="./assets/top-langs.svg" height="165" alt="Top Languages" /></picture>
 </div>
 
 <div align="center">
-  <img src="./assets/streak.svg" alt="GitHub Streak" />
+  <picture><img src="./assets/streak.svg" alt="GitHub Streak" /></picture>
 </div>
 
 <div align="center">
-  <img src="./assets/profile-details.svg" alt="GitHub Profile Summary" />
+  <picture><img src="./assets/profile-details.svg" alt="GitHub Profile Summary" /></picture>
 </div>
